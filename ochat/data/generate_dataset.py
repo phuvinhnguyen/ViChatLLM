@@ -132,13 +132,13 @@ def generate_split(model_type: str, model_path: str, conversations: list, split_
 
 
 def generate_dataset(model_type, model_path, in_files, out_prefix, per_sequence_loss, seed, eval_ratio):
-    # Load conversations
+    print('# Load conversations')
     conversations = []
     for filename in in_files:
         with open(filename, "rt") as f:
             conversations.extend(f.readlines())
 
-    # Train-test split
+    print('# Train-test split')
     random.seed(seed)
     random.shuffle(conversations)
     eval_num = int(eval_ratio * len(conversations))
@@ -146,6 +146,7 @@ def generate_dataset(model_type, model_path, in_files, out_prefix, per_sequence_
     train_conversations = conversations[eval_num:]
     eval_conversations  = conversations[:eval_num]
 
+    print('# Generate dataset')
     generate_split(model_type, model_path, train_conversations, "train", out_prefix, per_sequence_loss)
     if eval_num > 0:
         generate_split(model_type, model_path, eval_conversations, "eval", out_prefix, per_sequence_loss)
