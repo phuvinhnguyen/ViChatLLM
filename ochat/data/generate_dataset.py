@@ -115,7 +115,7 @@ def generate_split(model_type: str, model_path: str, conversations: list, split_
 
     schema = pyarrow.schema(schema, metadata={"metadata_json": orjson.dumps(metadata)})
 
-    # launch remote workers
+    print('# launch remote workers')
     if not ray.is_initialized():
         ray.init(ignore_reinit_error=True, num_cpus=os.cpu_count())
 
@@ -127,7 +127,7 @@ def generate_split(model_type: str, model_path: str, conversations: list, split_
         per_sequence_loss=per_sequence_loss
     ) for batch in _split(conversations, int(ray.available_resources()["CPU"]))]
 
-    # write
+    print('# write')
     parquet.write_table(pyarrow.concat_tables([ray.get(handle) for handle in handles]), f"{out_prefix}.{split_name}.parquet")
 
 
@@ -149,6 +149,7 @@ def generate_dataset(model_type, model_path, in_files, out_prefix, per_sequence_
     print('# Generate dataset')
     generate_split(model_type, model_path, train_conversations, "train", out_prefix, per_sequence_loss)
     if eval_num > 0:
+        print('# In if condition')
         generate_split(model_type, model_path, eval_conversations, "eval", out_prefix, per_sequence_loss)
 
 
