@@ -118,7 +118,7 @@ def generate_split(model_type: str, model_path: str, conversations: list, split_
     print('# launch remote workers')
     if not ray.is_initialized():
         print('# init ray')
-        ray.init(ignore_reinit_error=True, num_cpus=os.cpu_count())
+        ray.init(ignore_reinit_error=True)#(ignore_reinit_error=True, num_cpus=os.cpu_count())
 
     print('# convert')
     handles = [convert_conversation_batch.remote(
