@@ -7,6 +7,10 @@ import orjson
 
 from ochat.training_deepspeed.multipack_sampler import MultipackDistributedSampler
 
+import torch.multiprocessing as mp
+import gc
+
+load_lock = mp.Lock()
 
 def _find_multiple(a, b):
     return (-(a // -b)) * b
@@ -29,6 +33,8 @@ class OpenchatDataset(IterableDataset):
 
         assert batch_max_length % self.PAD_MULTIPLE == 0, f"Batch size {batch_max_length} need to be multiples of {self.PAD_MULTIPLE}"
 
+        load_lock.acquire()
+
         # Load data
         # Convert parquet to numpy for fast random access
         table = pq.read_table(dataset_filename, memory_map=True)
@@ -41,6 +47,9 @@ class OpenchatDataset(IterableDataset):
 
         # Free table space
         del table
+
+        gc.collect()
+        load_lock.release()
 
         # Create sampler
         self.sampler = MultipackDistributedSampler(
