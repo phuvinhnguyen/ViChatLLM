@@ -94,6 +94,7 @@ def create_model(args):
         use_reentrant=False
     ))
 
+    print('Loading optimizer...')
     # Optimizer
     optimizer = torch.optim.AdamW(model.parameters(),
                                   lr=args.lr,
@@ -102,12 +103,14 @@ def create_model(args):
                                   eps=args.eps,
                                   fused=True)
 
+    print('Loading Deepspeed model...')
     # DeepSpeed model
     model_engine, optimizer, _, _ = deepspeed.initialize(args=args,
                                                          model=model,
                                                          model_parameters=model.parameters(),
                                                          optimizer=optimizer)
 
+    print('Loading Arguments...')
     # Put deepspeed arguments
     args.device                         = model_engine.device
 
@@ -209,6 +212,7 @@ def train():
     model_engine, optimizer = create_model(args)
 
     # LR Scheduler
+    print('Creating LR scheduler...\n\n')
     lr_scheduler = create_lr_scheduler(args, train_total_steps)
 
     # Progress bar and logger

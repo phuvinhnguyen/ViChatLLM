@@ -27,7 +27,6 @@ class OpenchatDataset(IterableDataset):
             "nz_input_ids": torch.long,
             "nz_position_ids": torch.long,
             "nz_shifted_label_ids": torch.long,
-
             "nz_shifted_loss_weights": torch.bfloat16
         }
 
@@ -55,9 +54,7 @@ class OpenchatDataset(IterableDataset):
         self.sampler = MultipackDistributedSampler(
             lengths=self.dataset["total_length"],
             numseqs=self.dataset["num_seqs"],
-
             batch_max_length=batch_max_length,
-
             rank=rank,
             num_replicas=num_replicas,
             seed=0
